@@ -231,6 +231,3 @@ Conclusion
 Your WordPress site is now running on AWS EC2 with PHP 8.2, MySQL 8.1, and Apache. 🎉
 
 Public Url: http://3.79.186.55
-Admin Url: http://3.79.186.55
-Username: lazyloadx-admin
-Password: lazyloadx-adminpwd
