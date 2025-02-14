@@ -93,7 +93,7 @@ Step 6: Install WordPress
    ```
 2. Clone the WordPress repository:
    ```bash
-   sudo git clone https://github.com/WordPress/WordPress.git .
+   sudo git clone https://github.com/umair-afzal-uat/Take-Home-Assignment.
    ```
 3. Set the correct ownership and permissions:
    ```bash
