@@ -1,0 +1,43 @@
+/*
+Theme Name: LazyLoadX
+Author: Your Name
+Description: A LazyLoadX theme for the WordPress assignment.
+Version: 1.0
+*/
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.tabs {
+    margin: 20px 0;
+}
+
+.tab-links {
+    list-style: none;
+    padding: 0;
+}
+
+.tab-links li {
+    display: inline;
+    margin-right: 10px;
+}
+
+.tab-content {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.tab {
+    display: none;
+}
+
+.tab.active {
+    display: block;
+}
+
+footer {
+    background: #f1f1f1;
+    padding: 20px;
+    text-align: center;
+}
