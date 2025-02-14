@@ -1,4 +1,11 @@
 WordPress Setup on AWS EC2 with PHP 8.2, MySQL 8.1, and Apache
+Server Specs 
+
+AWS EC2 t2.micro instance
+Ubuntu 22.04.5 LTS
+PHP v8.1
+mysql v8.0
+Apache/2.4.52 (Ubuntu)
 
 Prerequisites
 
