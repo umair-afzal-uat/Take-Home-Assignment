@@ -2,63 +2,88 @@ jQuery(document).ready(function($) {
     $('.tab-links a').on('click', function(e) {
         e.preventDefault();
         var target = $(this).attr('href');
-
-        // Hide all tabs and show the selected tab
-        $('.tab').removeClass('active').hide(); // Hide all tabs
-        $(target).addClass('active').show(); // Show the selected tab
-
-        // Lazy load content for the second tab (YouTube Playlist)
+        $('.tab').removeClass('active').hide(); 
+        $(target).addClass('active').show(); 
+        $('.lazy-load').each(function() {
+            $(this).data('loaded', false); 
+            $(this).empty();
+            $(this).html('<p>Loading...</p>'); 
+        });
         if ($(target).is('#tab2')) {
             var lazyLoadElement = $(target).find('.lazy-load');
             if (!lazyLoadElement.data('loaded')) {
-                var youtubeUrl = lazyLoadElement.data('url');
-                if (youtubeUrl) {
-                    // Load the YouTube playlist iframe
-                    lazyLoadElement.html('<iframe width="100%" height="315" src="https://www.youtube.com/embed/videoseries?list=' + youtubeUrl.split('list=')[1] + '" frameborder="0" allowfullscreen></iframe>');
-                    lazyLoadElement.data('loaded', true);
-                } else {
-                    lazyLoadElement.html('<p>No YouTube playlist URL provided.</p>');
-                }
+                var postId = lazyLoadElement.data('post-id'); 
+                $.ajax({
+                    url: frontend_ajax_object.ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'load_youtube_playlist',
+                        post_id: postId
+                    },
+                    success: function(response) {
+                        lazyLoadElement.html(response);
+                        lazyLoadElement.data('loaded', true);
+                    },
+                    error: function() {
+                        lazyLoadElement.html('<p>Error loading YouTube playlist.</p>');
+                    }
+                });
             }
         }
-
-        // Lazy load content for the third tab (Featured Image)
         if ($(target).is('#tab3')) {
             var lazyLoadElement = $(target).find('.lazy-load');
             if (!lazyLoadElement.data('loaded')) {
-                var imageUrl = lazyLoadElement.data('url');
-                if (imageUrl) {
-                    lazyLoadElement.html('<img src="' + imageUrl + '" alt="Featured Image" style="max-width:100%; height:auto;"/>');
-                    lazyLoadElement.data('loaded', true);
-                } else {
-                    lazyLoadElement.html('<p>No featured image available.</p>');
-                }
+                var postId = lazyLoadElement.data('post-id'); 
+                $.ajax({
+                    url: frontend_ajax_object.ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'load_featured_image',
+                        post_id: postId
+                    },
+                    success: function(response) {
+                        lazyLoadElement.html(response);
+                        lazyLoadElement.data('loaded', true);
+                    },
+                    error: function() {
+                        lazyLoadElement.html('<p>Error loading featured image.</p>');
+                    }
+                });
             }
         }
     });
-
-    // Lazy load footer when scrolled to the bottom
-  
-
-    // Initial setup: hide all tabs except the first one
+    
     $('.tab').hide();
-    $('#tab1').show(); // Show the first tab by default
-
-
+    $('#tab1').show(); 
     var footerLoaded = false;
+    var footerContent = ''; 
+    $(window).scroll(function() {
+        var scrollTop = $(window).scrollTop();
+        var windowHeight = $(window).height();
+        var documentHeight = $(document).height();
+        if (!footerLoaded && scrollTop + windowHeight >= documentHeight - 100) {
+            footerLoaded = true; 
 
-    $(window).on('scroll', function() {
-        if (!footerLoaded && ($(window).height() + $(window).scrollTop()) >= $(document).height() - 100) {
-            footerLoaded = true; // Prevent multiple loads
-            loadFooterContent();
+            $.ajax({
+                url: frontend_ajax_object.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'load_lazy_footer',
+                },
+                success: function(response) {
+                    if (response.success) {
+                        footerContent = response.data; 
+                        $('#footer-container').append(footerContent);
+                    }
+                },
+                error: function() {
+                    console.log('Error loading footer');
+                }
+            });
+        }
+        if (footerLoaded && scrollTop + windowHeight < documentHeight - 100) {
+            $('#footer-container').empty(); 
+            footerLoaded = false;
         }
     });
-
-    function loadFooterContent() {
-        // Simulate an AJAX request to load footer content
-        setTimeout(function() {
-            var footerContent = '<p>This is the lazy-loaded footer content.</p>'; // Replace with actual content or AJAX call
-            $('#lazy-footer .footer-content').html(footerContent);
-        }, 500); // Simulate a delay for loading
-    }
 });
