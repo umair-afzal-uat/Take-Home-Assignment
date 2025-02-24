@@ -2,88 +2,77 @@ jQuery(document).ready(function($) {
     $('.tab-links a').on('click', function(e) {
         e.preventDefault();
         var target = $(this).attr('href');
-        $('.tab').removeClass('active').hide(); 
-        $(target).addClass('active').show(); 
-        $('.lazy-load').each(function() {
-            $(this).data('loaded', false); 
-            $(this).empty();
-            $(this).html('<p>Loading...</p>'); 
-        });
-        if ($(target).is('#tab2')) {
-            var lazyLoadElement = $(target).find('.lazy-load');
-            if (!lazyLoadElement.data('loaded')) {
-                var postId = lazyLoadElement.data('post-id'); 
-                $.ajax({
-                    url: frontend_ajax_object.ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'load_youtube_playlist',
-                        post_id: postId
-                    },
-                    success: function(response) {
-                        lazyLoadElement.html(response);
-                        lazyLoadElement.data('loaded', true);
-                    },
-                    error: function() {
-                        lazyLoadElement.html('<p>Error loading YouTube playlist.</p>');
-                    }
-                });
-            }
-        }
-        if ($(target).is('#tab3')) {
-            var lazyLoadElement = $(target).find('.lazy-load');
-            if (!lazyLoadElement.data('loaded')) {
-                var postId = lazyLoadElement.data('post-id'); 
-                $.ajax({
-                    url: frontend_ajax_object.ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'load_featured_image',
-                        post_id: postId
-                    },
-                    success: function(response) {
-                        lazyLoadElement.html(response);
-                        lazyLoadElement.data('loaded', true);
-                    },
-                    error: function() {
-                        lazyLoadElement.html('<p>Error loading featured image.</p>');
-                    }
-                });
+
+        // Show the selected tab
+        $('.tab').removeClass('active').hide();
+        $(target).addClass('active').show();
+
+        // Handle Lazy Loading Dynamically
+        var lazyLoadElement = $(target).find('.lazy-load');
+        if (lazyLoadElement.length && !lazyLoadElement.data('loaded')) {
+            var action = lazyLoadElement.data('action'); // Get action dynamically
+            var postId = lazyLoadElement.data('post-id'); // Get post ID dynamically
+
+            if (action) {
+                loadTabContent(lazyLoadElement, action, postId);
             }
         }
     });
-    
+
+    function loadTabContent(element, action, postId) {
+        element.html('<p>Loading...</p>');
+
+        $.ajax({
+            type: "GET", // Changed to GET as suggested
+            url: frontend_ajax_object.ajaxurl,
+            data: {
+                action: "load_tab_content", // Unified AJAX handler
+                security: frontend_ajax_object.security,
+                tab_action: action,
+                post_id: postId
+            },
+            success: function(response) {
+                element.html(response);
+                element.data('loaded', true);
+            },
+            error: function() {
+                element.html('<p>Error loading content.</p>');
+            }
+        });
+    }
+
     $('.tab').hide();
-    $('#tab1').show(); 
+    $('#tab1').show();
+    
     var footerLoaded = false;
-    var footerContent = ''; 
-    $(window).scroll(function() {
+
+    $(window).scroll(function () {
         var scrollTop = $(window).scrollTop();
         var windowHeight = $(window).height();
         var documentHeight = $(document).height();
+
         if (!footerLoaded && scrollTop + windowHeight >= documentHeight - 100) {
-            footerLoaded = true; 
+            footerLoaded = true;
 
             $.ajax({
+                type: "GET",  // Changed from POST to GET
                 url: frontend_ajax_object.ajaxurl,
-                type: 'POST',
                 data: {
-                    action: 'load_lazy_footer',
+                    action: "load_lazy_footer",
+                    security: frontend_ajax_object.security,
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
-                        footerContent = response.data; 
-                        $('#footer-container').append(footerContent);
+                        $('#footer-container').html(response.data);
+                    } else {
+                        $('#footer-container').html('<p>Error loading footer.</p>');
                     }
                 },
-                error: function() {
-                    console.log('Error loading footer');
+                error: function () {
+                    $('#footer-container').html('<p>Error loading footer.</p>');
                 }
             });
         }
-        if (footerLoaded && scrollTop + windowHeight < documentHeight - 100) {
-            $('#footer-container').empty(); 
-            footerLoaded = false;
-        }
     });
+    
 });

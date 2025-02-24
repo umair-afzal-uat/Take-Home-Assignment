@@ -28,16 +28,16 @@ get_header(); ?>
                         <p><?php the_content(); ?></p>
                     </div>
 
-                    <!-- Second Tab: YouTube Playlist -->
+                    <!-- Second Tab: YouTube Playlist (Lazy Load) -->
                     <div id="tab2" class="tab">
-                        <div class="lazy-load" data-post-id="<?php echo get_the_ID(); ?>">
+                        <div class="lazy-load" data-action="load_youtube_playlist" data-post-id="<?php echo get_the_ID(); ?>">
                             <p>Loading YouTube Playlist...</p>
                         </div>
                     </div>
 
-                    <!-- Third Tab: Post Featured Image -->
+                    <!-- Third Tab: Post Featured Image (Lazy Load) -->
                     <div id="tab3" class="tab">
-                        <div class="lazy-load" data-post-id="<?php echo get_the_ID(); ?>">
+                        <div class="lazy-load" data-action="load_featured_image" data-post-id="<?php echo get_the_ID(); ?>">
                             <p>Loading Featured Image...</p>
                         </div>
                     </div>
